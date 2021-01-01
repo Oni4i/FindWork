@@ -12,7 +12,7 @@ ___
 ### Install:
 1. <code>composer install</code>
 2. rename .envexample to .env
-3. setting your database
+3. setting your database in .env file
 4. <code>php artisan key:generate</code>
 5. <code>php artisan migrate</code>
 6. <code>npm install</code>
