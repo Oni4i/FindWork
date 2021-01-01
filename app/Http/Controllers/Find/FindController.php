@@ -18,7 +18,7 @@ class FindController extends Controller
 
     public function search(Request $request) {
         //Compare
-        if (!$request->options || !$request->options['sites']) {
+        if (!$request->has('options') || !isset($request->options['sites'])) {
             $validSites = array_keys($this->sites);
         } else {
             $validSites = array_intersect(array_keys($this->sites), $request->options['sites']);
@@ -29,7 +29,7 @@ class FindController extends Controller
 
         //Call require site classes
         foreach ($validSites as $site) {
-            $data[$site] = call_user_func_array(['App\Helpers\\' . $this->sites[$site], 'search'], [$request->query, $request->options]);
+            $data[$site] = call_user_func_array(['App\Helpers\\' . $this->sites[$site], 'search'], [$request->input('query'), $request->options]);
         }
 
         return response()->json(['success' => 1, 'response' => $data]);
