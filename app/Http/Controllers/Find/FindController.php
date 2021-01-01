@@ -29,7 +29,7 @@ class FindController extends Controller
 
         //Call require site classes
         foreach ($validSites as $site) {
-            $data[$site] = call_user_func_array(['App\Helpers\\' . $site, 'search'], [$request->query, $request->options]);
+            $data[$site] = call_user_func_array(['App\Helpers\\' . $this->sites[$site], 'search'], [$request->query, $request->options]);
         }
 
         return response()->json($data);
