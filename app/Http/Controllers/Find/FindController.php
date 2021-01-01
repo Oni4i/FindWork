@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Find;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use function Sodium\compare;
 
 class FindController extends Controller
 {
