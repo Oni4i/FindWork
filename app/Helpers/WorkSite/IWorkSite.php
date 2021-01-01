@@ -7,13 +7,15 @@ interface IWorkSite {
      * @param string $query
      * @param object $options
      * @return array [
+     *  array [
      *      site => string,
      *      link => string,
      *      title => string,
      *      description => string,
      *      salary => integer|null,
      *      date => string
+     * ]
      *]
      */
-    public function search($query, $options);
+    public static function search($query, $options);
 }

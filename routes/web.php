@@ -26,7 +26,7 @@ Route::group(['middleware' => 'auth'], function() {
     });
     Route::group(['as' => 'find', 'prefix' => 'find', 'namespace' => 'Find'], function() {
         Route::get('/', 'FindController@index');
-        Route::post('/search', 'FindController@search')->middleware('find')->name('.search');
+        Route::get('/search', 'FindController@search')->middleware('find')->name('.search');
     });
 });
 Route::middleware('guest')->group(function() {

@@ -19,11 +19,11 @@ class FindMiddleware
         $validator = Validator::make($request->all(),
         [
             'query' => 'required|string',
-            'option' => 'array|nullable',
-            'option.sites' => 'array|nullable',
-            'option.sites.*' => 'string|nullable',
-            'option.countries' => 'array|nullable',
-            'option.countries.*' => 'string|nullable'
+            'options' => 'array|nullable',
+            'options.sites' => 'array|nullable',
+            'options.sites.*' => 'string|nullable',
+            'options.countries' => 'array|nullable',
+            'options.countries.*' => 'string|nullable'
         ]);
 
         if ($validator->fails()) {
