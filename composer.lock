@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b5b487c78defbb7ec78f1e632805560",
+    "content-hash": "09799373960f146fe453b9434c8f0777",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -780,6 +780,48 @@
                 "url"
             ],
             "time": "2020-09-30T07:37:11+00:00"
+        },
+        {
+            "name": "ivopetkov/html5-dom-document-php",
+            "version": "v2.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ivopetkov/html5-dom-document-php.git",
+                "reference": "667e4504c73a4f36f754c235c8159acf263ff75e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ivopetkov/html5-dom-document-php/zipball/667e4504c73a4f36f754c235c8159acf263ff75e",
+                "reference": "667e4504c73a4f36f754c235c8159acf263ff75e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "ivopetkov/docs-generator": "0.2.*",
+                "phpunit/phpunit": "6.*"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ivo Petkov",
+                    "email": "ivo@ivopetkov.com",
+                    "homepage": "http://ivopetkov.com"
+                }
+            ],
+            "description": "HTML5 DOMDocument PHP library (extends DOMDocument)",
+            "time": "2020-11-09T08:57:17+00:00"
         },
         {
             "name": "laravel/framework",
