@@ -1,0 +1,30 @@
+* {
+    font-family: 'Hanalei Fill', cursive;
+}
+
+a.navbar-brand {
+    font-size: 2em;
+    letter-spacing: 13.1px;
+}
+
+a.nav-link, a.dropdown-item {
+    font-size: 1.3em;
+}
+
+ul.navbar-nav.justify-content-between {
+}
+ul.navbar-nav.justify-content-between.ml-auto {
+}
+
+.card-work .card-text {
+    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card.card-work {
+    height: 20em;
+}

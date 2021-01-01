@@ -1,0 +1,21 @@
+
+   TypeError 
+
+  Argument 1 passed to Illuminate\Routing\Router::group() must be of the type array, object given, called in Z:\openServer\domains\laravel_7\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php on line 261
+
+  at Z:\openServer\domains\laravel_7\vendor\laravel\framework\src\Illuminate\Routing\Router.php:367
+    363|      * @param  array  $attributes
+    364|      * @param  \Closure|string  $routes
+    365|      * @return void
+    366|      */
+  > 367|     public function group(array $attributes, $routes)
+    368|     {
+    369|         $this->updateGroupStack($attributes);
+    370| 
+    371|         // Once we have updated the group stack, we'll load the provided routes and
+
+  1   Z:\openServer\domains\laravel_7\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:261
+      Illuminate\Routing\Router::group()
+
+  2   Z:\openServer\domains\laravel_7\routes\web.php:25
+      Illuminate\Support\Facades\Facade::__callStatic()
