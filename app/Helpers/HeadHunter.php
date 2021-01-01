@@ -38,10 +38,10 @@ class HeadHunter implements IWorkSite {
         $html = new HTML5DOMDocument();
         $html->loadHTMLFile($url, LIBXML_NOERROR);
         $selector = $html->querySelectorAll('a.bloko-button.HH-Pager-Control');
-        if (!$selector || count($selector) <= 3) {
+        if (!$selector || count($selector) <= 2) {
             return 0;
         }
-        return $selector[count($selector) - 2]->getTextContent() - 1;
+        return (int)$selector[count($selector) - 2]->getTextContent();
     }
 
     private static function getPreparedUrl($query, $code, $options) {
