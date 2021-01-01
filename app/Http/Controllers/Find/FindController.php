@@ -10,4 +10,10 @@ class FindController extends Controller
     public function index() {
         return view('find.index');
     }
+
+    public function search(Request $request) {
+
+
+        return response()->json('');
+    }
 }
