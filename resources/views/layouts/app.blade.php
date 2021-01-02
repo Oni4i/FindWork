@@ -77,5 +77,7 @@
         @yield('content')
     </main>
 </div>
+@section('scripts')
+@endsection
 </body>
 </html>

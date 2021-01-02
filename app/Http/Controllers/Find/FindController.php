@@ -17,6 +17,7 @@ class FindController extends Controller
     }
 
     public function search(Request $request) {
+        ini_set('max_execution_time', 100000);
         //Compare
         if (!$request->has('options') || !isset($request->options['sites'])) {
             $validSites = array_keys($this->sites);
