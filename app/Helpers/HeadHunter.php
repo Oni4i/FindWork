@@ -47,7 +47,7 @@ class HeadHunter implements IWorkSite {
         foreach ($urls as $code => $codeUrls) {
             foreach ($codeUrls as $url) {
 //                $result[$code][] = self::getVacancies($url);
-                $result += self::getVacancies($url);
+                $result = array_merge($result, self::getVacancies($url));
             }
         }
 
