@@ -25,12 +25,56 @@ class HeadHunter implements IWorkSite {
 
         foreach ($codes as $code) {
             $url = self::getPreparedUrl($query, $code->id, $options);
-            $pages[$code->name] = self::getNumberOfPages($url);
+            $pages[$code->id]['pages'] = self::getNumberOfPages($url);
+            $pages[$code->id]['name'] = $code->name;
         }
-        return $pages;
+
+        $urls =[];
+        foreach ($pages as $code => $value) {
+            for ($i = 0; $i < $value['pages'] || ($value['pages'] === 0 && $i === 0); $i++) {
+                $urls[$code][] = self::getPreparedUrl($query, $code, $options, $i);
+            }
+        }
+
+        foreach ($urls as $code => $codeUrls) {
+            foreach ($codeUrls as $url) {
+                $result[$code][] = self::getVacancies($url);
+            }
+        }
+
+        return $result;
     }
 
-    private static function getUrls($query, $options) {
+    private static function getVacancies($url) {
+        $html = new HTML5DOMDocument();
+        $html->loadHTMLFile($url, LIBXML_NOERROR);
+        $selector = $html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy');
+
+        if (!$selector && !count($selector)) {
+            return null;
+        }
+
+        foreach ($selector as $vacancyHtml) {
+            $vacancy['title'] = $vacancyHtml->querySelector('.vacancy-serp-item__info .g-user-content a')->getTextContent();
+            $vacancy['link'] = $vacancyHtml->querySelector('.vacancy-serp-item__info .g-user-content a')->getAttribute('href');
+            $vacancy['link'] = explode('?', str_replace('//', '/', $vacancy['link']))[0];
+            $vacancy['city'] = $vacancyHtml->querySelector('span[data-qa="vacancy-serp__vacancy-address"]')->getTextContent();
+            $vacancy['description'] = $vacancyHtml->querySelector('div[data-qa="vacancy-serp__vacancy_snippet_responsibility"]')->getTextContent();
+
+            $vacancy['company'] = null;
+            if ($vacancyHtml->querySelector('a[data-qa="vacancy-serp__vacancy-employer"]')) {
+                $vacancy['company'] = $vacancyHtml->querySelector('a[data-qa="vacancy-serp__vacancy-employer"]')->getTextContent();
+            }
+
+            $vacancy['salary'] = null;
+            if ($vacancyHtml->querySelector('span[data-qa="vacancy-serp__vacancy-compensation"]')) {
+                $vacancy['salary'] = $vacancyHtml->querySelector('span[data-qa="vacancy-serp__vacancy-compensation"]')->getTextContent();
+            }
+
+            $vacancies[] = $vacancy;
+        }
+
+        return $vacancies;
 
     }
 
@@ -44,7 +88,7 @@ class HeadHunter implements IWorkSite {
         return (int)$selector[count($selector) - 2]->getTextContent();
     }
 
-    private static function getPreparedUrl($query, $code, $options) {
+    private static function getPreparedUrl($query, $code, $options, $page = null) {
         $params = [
             'text' => $query,
             'area' => $code,
@@ -53,6 +97,7 @@ class HeadHunter implements IWorkSite {
             'enable_snippets' => 'true',
             'st' => 'searchVacancy'
         ];
+        if ($page !== null) $params['page'] = $page;
         foreach ($options as $name => $value) {
             if (in_array($name, array_keys(self::$options))) {
                 $params[self::$options[$name]] = $value;

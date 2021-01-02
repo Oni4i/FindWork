@@ -32,6 +32,6 @@ class FindController extends Controller
             $data[$site] = call_user_func_array(['App\Helpers\\' . $this->sites[$site], 'search'], [$request->input('query'), $request->options]);
         }
 
-        return response()->json(['success' => 1, 'response' => $data]);
+        return response()->json(['success' => 1, 'response' => $data], '200', [], JSON_UNESCAPED_UNICODE);
     }
 }

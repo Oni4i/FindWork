@@ -13,7 +13,7 @@ interface IWorkSite {
      *      title => string,
      *      description => string,
      *      salary => integer|null,
-     *      date => string
+     *      company => integer|null
      * ]
      *]
      */
