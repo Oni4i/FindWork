@@ -50,7 +50,7 @@ class HeadHunter implements IWorkSite {
         $html->loadHTMLFile($url, LIBXML_NOERROR);
         $selector = $html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy');
 
-        if (!$selector && !count($selector)) {
+        if (!$selector) {
             return null;
         }
 
