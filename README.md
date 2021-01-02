@@ -1,5 +1,5 @@
 #  FWork
-### FWork is a simple parser of many work sites for find work from big list of works.
+### FWork is a non-profit simple parser of many work sites for find work from big list of works.
 ___
 ### Stack:
 + Laravel 7
