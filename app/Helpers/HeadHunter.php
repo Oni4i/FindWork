@@ -18,12 +18,22 @@ class HeadHunter implements IWorkSite {
         'st' => 'searchVacancy'
     ];
 
+    /**
+     * @param string $query
+     * @param array $options
+     * @return array
+     */
     public static function search($query, $options) {
         $html = new HTML5DOMDocument();
         $html->loadHTMLFile(self::$url, LIBXML_NOERROR);
         return self::getAllCountriesData($query, $options);
     }
 
+    /**
+     * @param string $query
+     * @param array $options
+     * @return array
+     */
     private static function getAllCountriesData($query, $options) {
         if (!$options || !$options['countries']) $options['countries'] = [];
         $codes = self::getCodesByCountries($options['countries']);
@@ -50,10 +60,13 @@ class HeadHunter implements IWorkSite {
                 $result = array_merge($result, self::getVacancies($url));
             }
         }
-
         return $result;
     }
 
+    /**
+     * @param string $url
+     * @return array|null
+     */
     private static function getVacancies($url) {
         $html = new HTML5DOMDocument();
         $html->loadHTMLFile($url, LIBXML_NOERROR);
@@ -82,9 +95,13 @@ class HeadHunter implements IWorkSite {
             $vacancies[] = $vacancy;
         }
 
-        return $vacancies;
+        return $vacancies ?? null;
     }
 
+    /**
+     * @param string $url
+     * @return integer
+     */
     private static function getNumberOfPages($url) {
         $html = new HTML5DOMDocument();
         $html->loadHTMLFile($url, LIBXML_NOERROR);
@@ -95,6 +112,13 @@ class HeadHunter implements IWorkSite {
         return (int)$selector[count($selector) - 2]->getTextContent();
     }
 
+    /**
+     * @param string $query
+     * @param integer $code
+     * @param array $options
+     * @param null|integer $page
+     * @return string
+     */
     private static function getPreparedUrl($query, $code, $options, $page = null) {
         $params = [
             'text' => $query,
@@ -109,6 +133,10 @@ class HeadHunter implements IWorkSite {
         return self::$url . http_build_query($params);
     }
 
+    /**
+     * @param array $countries
+     * @return array
+     */
     private static function getCodesByCountries($countries) {
         $codesJSON = self::getCodesJSON();
         if ($countries) {
@@ -124,6 +152,9 @@ class HeadHunter implements IWorkSite {
         return array_chunk($codes, count($codes))[0];
     }
 
+    /**
+     * @return object
+     */
     private static function getCodesJSON() {
         return json_decode(file_get_contents(asset('json/countries.json')));
     }
