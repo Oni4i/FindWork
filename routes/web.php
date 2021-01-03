@@ -20,8 +20,10 @@ Route::get('/', function () {
 Route::group(['middleware' => 'auth'], function() {
     Route::group(['as' => 'profile', 'prefix' => 'profile', 'namespace' => 'Profile'], function() {
         Route::get('/', 'ProfileController@index');
-        Route::group(['as' => '.'], function() {
-            Route::resource('vacancy', 'Vacancy\VacancyController');
+        Route::group(['as' => '.vacancy', 'prefix' => 'vacancy'], function() {
+            Route::get('', 'Vacancy\VacancyController@index')->name('.index');
+            Route::post('', 'Vacancy\VacancyController@store')->name('.store');
+            Route::delete('', 'Vacancy\VacancyController@destroy')->name('.destroy');
         });
     });
     Route::group(['as' => 'find', 'prefix' => 'find', 'namespace' => 'Find'], function() {

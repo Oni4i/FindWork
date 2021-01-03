@@ -189,55 +189,39 @@
 
             static action(btn) {
                 btn = $(btn);
-                if (btn.data('favourite')) {
+                if (btn.data('favourite') == '1') {
                     Vacancy.delete(btn);
                 } else {
                     Vacancy.save(btn);
                 }
             }
 
-            {{--static delete(btn) {--}}
-            {{--    let parent = btn.parent();--}}
-            {{--    console.log({--}}
-            {{--        title: parent.find('.vacancy_title').text(),--}}
-            {{--        location: parent.find('.vacancy_city').text(),--}}
-            {{--        salary: parent.find('.vacancy_salary').text(),--}}
-            {{--        company: parent.find('.vacancy_company').text(),--}}
-            {{--        description: parent.find('.vacancy_description').text(),--}}
-            {{--        link: parent.find('.vacancy_link').attr('href'),--}}
-            {{--        site: parent.find('.vacancy_site').text()--}}
-            {{--    })--}}
-            {{--    $.ajax({--}}
-            {{--        url: '{{route('profile.vacancy.destroy')}}',--}}
-            {{--        type: 'POST',--}}
-            {{--        data: {--}}
-            {{--            _method: 'POST',--}}
-            {{--            _token: '{{csrf_token()}}',--}}
-            {{--            title: parent.find('.vacancy_title').text(),--}}
-            {{--            location: parent.find('.vacancy_city').text(),--}}
-            {{--            salary: parent.find('.vacancy_salary').text(),--}}
-            {{--            company: parent.find('.vacancy_company').text(),--}}
-            {{--            description: parent.find('.vacancy_description').text(),--}}
-            {{--            link: parent.find('.vacancy_link').attr('href'),--}}
-            {{--            site: parent.find('.vacancy_site').text()--}}
-            {{--        },--}}
-            {{--        success: function (response) {--}}
-            {{--            btn.html('&#9733;').css('color', '#ffcc99');--}}
-            {{--        }--}}
-            {{--    })--}}
-            {{--}--}}
+            static delete(btn) {
+                let parent = btn.parent();
+                $.ajax({
+                    url: '{{route('profile.vacancy.destroy')}}',
+                    type: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        _token: '{{csrf_token()}}',
+                        title: parent.find('.vacancy_title').text(),
+                        location: parent.find('.vacancy_city').text(),
+                        salary: parent.find('.vacancy_salary').text(),
+                        company: parent.find('.vacancy_company').text(),
+                        description: parent.find('.vacancy_description').text(),
+                        link: parent.find('.vacancy_link').attr('href'),
+                        site: parent.find('.vacancy_site').text()
+                    },
+                    success: function (response) {
+                        btn.html('☆')
+                        btn.data('favourite', '0');
+                    }
+                })
+            }
 
             static save(btn) {
                 let parent = btn.parent();
-                console.log({
-                    title: parent.find('.vacancy_title').text(),
-                    location: parent.find('.vacancy_city').text(),
-                    salary: parent.find('.vacancy_salary').text(),
-                    company: parent.find('.vacancy_company').text(),
-                    description: parent.find('.vacancy_description').text(),
-                    link: parent.find('.vacancy_link').attr('href'),
-                    site: parent.find('.vacancy_site').text()
-                })
+                console.log(btn.data('favourite'))
                 $.ajax({
                     url: '{{route('profile.vacancy.store')}}',
                     type: 'POST',
@@ -253,7 +237,9 @@
                         site: parent.find('.vacancy_site').text()
                     },
                     success: function (response) {
-                        btn.html('&#9733;').css('color', '#ffcc99');
+                        btn.html('&#9733;')
+                        btn.data('favourite', '1');
+
                     }
                 })
             }

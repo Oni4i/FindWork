@@ -95,11 +95,18 @@ class VacancyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Vacancies  $vacancies
-     * @return \Illuminate\Http\Response
+     * @param  Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Vacancies $vacancies)
+    public function destroy(Request $request)
     {
-        //
+        $request->validate([
+            'link' => 'required'
+        ]);
+        $vacancy = Vacancy::query()->where('link', $request->link)->first();
+        if ($vacancy && User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->find($vacancy->id)) {
+            User::query()->find(Auth::user()->id)->vacancies()->detach($vacancy);
+        }
+        return response()->json(['success' => 1]);
     }
 }
