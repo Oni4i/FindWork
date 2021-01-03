@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Find;
 
 use App\Http\Controllers\Controller;
-use App\User;
-use App\Vacancy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
