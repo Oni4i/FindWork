@@ -17,7 +17,7 @@ class CreateVacanciesTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('site');
-            $table->string('link');
+            $table->string('link')->unique();
             $table->string('location');
             $table->string('salary')->nullable();
             $table->string('company')->nullable();

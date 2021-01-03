@@ -162,11 +162,12 @@
                     let vacanciesRow = $('.vacancies_row');
                     vacanciesRow.html('');
 
+
                     vacancies['response']['hh'].forEach(vacancy => {
                         vacanciesRow.append(`
                                     <div class="col mb-4">
                                         <div class="card card-work">
-                                            <button class="favourite" onclick="Vacancy.save(this)">☆</button>
+                                            <button class="favourite" data-favourite=${vacancy['isFavourite'] ? 1 : 0} onclick="Vacancy.action(this)">${vacancy['isFavourite'] ? '&#9733' : '☆' }</button>
                                             <div class="card-body">
                                                 <h4 class="card-title vacancy_title">${vacancy['title']}</h4>
                                                 <h5 class="card-title vacancy_city">${vacancy['city']}</h5>
@@ -186,8 +187,47 @@
                 }
             }
 
-            static save(btn) {
+            static action(btn) {
                 btn = $(btn);
+                if (btn.data('favourite')) {
+                    Vacancy.delete(btn);
+                } else {
+                    Vacancy.save(btn);
+                }
+            }
+
+            {{--static delete(btn) {--}}
+            {{--    let parent = btn.parent();--}}
+            {{--    console.log({--}}
+            {{--        title: parent.find('.vacancy_title').text(),--}}
+            {{--        location: parent.find('.vacancy_city').text(),--}}
+            {{--        salary: parent.find('.vacancy_salary').text(),--}}
+            {{--        company: parent.find('.vacancy_company').text(),--}}
+            {{--        description: parent.find('.vacancy_description').text(),--}}
+            {{--        link: parent.find('.vacancy_link').attr('href'),--}}
+            {{--        site: parent.find('.vacancy_site').text()--}}
+            {{--    })--}}
+            {{--    $.ajax({--}}
+            {{--        url: '{{route('profile.vacancy.destroy')}}',--}}
+            {{--        type: 'POST',--}}
+            {{--        data: {--}}
+            {{--            _method: 'POST',--}}
+            {{--            _token: '{{csrf_token()}}',--}}
+            {{--            title: parent.find('.vacancy_title').text(),--}}
+            {{--            location: parent.find('.vacancy_city').text(),--}}
+            {{--            salary: parent.find('.vacancy_salary').text(),--}}
+            {{--            company: parent.find('.vacancy_company').text(),--}}
+            {{--            description: parent.find('.vacancy_description').text(),--}}
+            {{--            link: parent.find('.vacancy_link').attr('href'),--}}
+            {{--            site: parent.find('.vacancy_site').text()--}}
+            {{--        },--}}
+            {{--        success: function (response) {--}}
+            {{--            btn.html('&#9733;').css('color', '#ffcc99');--}}
+            {{--        }--}}
+            {{--    })--}}
+            {{--}--}}
+
+            static save(btn) {
                 let parent = btn.parent();
                 console.log({
                     title: parent.find('.vacancy_title').text(),

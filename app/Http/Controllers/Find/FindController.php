@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Find;
 
 use App\Http\Controllers\Controller;
+use App\User;
+use App\Vacancy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FindController extends Controller
 {
@@ -34,6 +37,18 @@ class FindController extends Controller
                 ['App\Helpers\\' . $this->sites[$site], 'search'],
                 [$request->input('query'), $request->options]
             );
+        }
+
+        $links = User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->pluck('link');
+        foreach ($data as &$site) {
+            if (!is_array($site)) continue;
+            foreach ($site as &$info) {
+                if ($links->contains($info['link'])) {
+                    $info['isFavourite'] = 1;
+                } else {
+                    $info['isFavourite'] = 0;
+                }
+            }
         }
 
         return response()->json(['success' => 1, 'response' => $data], '200', [], JSON_UNESCAPED_UNICODE);

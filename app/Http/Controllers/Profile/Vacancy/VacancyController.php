@@ -49,8 +49,11 @@ class VacancyController extends Controller
             'link' => 'required|string|min:20',
         ]);
 
-        $vacancy = Vacancy::query()->create($request->all());
-        $vacancy->users()->attach(User::query()->find(Auth::user()->id));
+        $vacancy = Vacancy::query()->where('link', $request->link)->first();
+        if (!$vacancy || !User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->find($vacancy->id)) {
+            if (!$vacancy) $vacancy = Vacancy::query()->create($request->all());
+            $vacancy->users()->attach(User::query()->find(Auth::user()->id));
+        }
 
         return response()->json(['success' => 1]);
     }
