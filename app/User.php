@@ -38,7 +38,7 @@ class User extends Authenticatable
     ];
 
 
-    public function languages() {
-        return $this->hasMany(Language::class);
+    public function vacancies() {
+        return $this->belongsToMany(Vacancy::class);
     }
 }

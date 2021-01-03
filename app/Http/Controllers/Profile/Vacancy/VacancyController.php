@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Profile\Vacancy;
 
 use App\Http\Controllers\Controller;
-use App\Vacancies;
+use App\User;
+use App\Vacancy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VacancyController extends Controller
 {
@@ -15,7 +17,8 @@ class VacancyController extends Controller
      */
     public function index()
     {
-        return view('profile.vacancy.index');
+        $vacancies = User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->get();
+        return view('profile.vacancy.index', compact('vacancies'));
     }
 
     /**
@@ -32,11 +35,24 @@ class VacancyController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|min:1',
+            'location' => 'required|string|min:1',
+            'site' => 'required|string|min:1',
+            'salary' => 'string|nullable',
+            'company' => 'string|nullable',
+            'description' => 'string|nullable',
+            'link' => 'required|string|min:20',
+        ]);
+
+        $vacancy = Vacancy::query()->create($request->all());
+        $vacancy->users()->attach(User::query()->find(Auth::user()->id));
+
+        return response()->json(['success' => 1]);
     }
 
     /**

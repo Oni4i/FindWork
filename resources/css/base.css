@@ -48,3 +48,13 @@ ul.navbar-nav.justify-content-between.ml-auto {
     top: 0;
     color: #cc1d00;
 }
+
+button.favourite {
+    background: 0;
+    border: 0;
+    font-size: 2em;
+    position: absolute;
+    right: -4px;
+    top: -11px;
+    outline: 0;
+}

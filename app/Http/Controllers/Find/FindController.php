@@ -30,7 +30,10 @@ class FindController extends Controller
 
         //Call require site classes
         foreach ($validSites as $site) {
-            $data[$site] = call_user_func_array(['App\Helpers\\' . $this->sites[$site], 'search'], [$request->input('query'), $request->options]);
+            $data[$site] = call_user_func_array(
+                ['App\Helpers\\' . $this->sites[$site], 'search'],
+                [$request->input('query'), $request->options]
+            );
         }
 
         return response()->json(['success' => 1, 'response' => $data], '200', [], JSON_UNESCAPED_UNICODE);

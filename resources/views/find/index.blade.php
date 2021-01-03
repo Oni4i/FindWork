@@ -18,7 +18,8 @@
         </div>
     </div>
     <!-- Modal sites -->
-    <div class="modal fade" id="modal_sites" tabindex="-1" role="dialog" aria-labelledby="modal_sites_title" aria-hidden="true">
+    <div class="modal fade" id="modal_sites" tabindex="-1" role="dialog" aria-labelledby="modal_sites_title"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
@@ -52,7 +53,8 @@
         </div>
     </div>
     <!-- Modal countries -->
-    <div class="modal fade" id="modal_countries" tabindex="-1" role="dialog" aria-labelledby="modal_countries_title" aria-hidden="true">
+    <div class="modal fade" id="modal_countries" tabindex="-1" role="dialog" aria-labelledby="modal_countries_title"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content bg-dark">
                 <div class="modal-header">
@@ -68,7 +70,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Country</span>
                         </div>
-                        <input type="text" class="form-control" id="country_add_field" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        <input type="text" class="form-control" id="country_add_field" aria-label="Default"
+                               aria-describedby="inputGroup-sizing-default">
                     </div>
                     <div class="text-right">
                         <button type="button" class="btn btn-success" onclick="Country.add()">Add</button>
@@ -80,7 +83,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('scripts')
@@ -88,13 +90,13 @@
         let countries = ['Россия', 'Украина'];
         let sites = [];
 
-        document.addEventListener("DOMContentLoaded", function(event) {
+        document.addEventListener("DOMContentLoaded", function (event) {
             Site.options();
         });
 
         class Site {
             static options() {
-                $('#modal_sites').find('input[type="checkbox"]').change(function() {
+                $('#modal_sites').find('input[type="checkbox"]').change(function () {
                     if (this.checked) {
                         sites.push(this.value)
                     } else {
@@ -164,15 +166,16 @@
                         vacanciesRow.append(`
                                     <div class="col mb-4">
                                         <div class="card card-work">
+                                            <button class="favourite" onclick="Vacancy.save(this)">☆</button>
                                             <div class="card-body">
-                                                <h4 class="card-title">${vacancy['title']}</h4>
-                                                <h5 class="card-title">${vacancy['city']}</h5>
-                                                <h6 class="card-title">${vacancy['salary'] ? vacancy['salary'] : ''}</h6>
-                                                <h6 class="card-title">${vacancy['company'] ? vacancy['company'] : ''}</h6>
-                                                <h6 class="card-title">${vacancy['site'] ? vacancy['site'] : ''}</h6>
-                                                <p class="card-text">${vacancy['description']}</p>
+                                                <h4 class="card-title vacancy_title">${vacancy['title']}</h4>
+                                                <h5 class="card-title vacancy_city">${vacancy['city']}</h5>
+                                                <h6 class="card-title vacancy_salary">${vacancy['salary'] ? vacancy['salary'] : ''}</h6>
+                                                <h6 class="card-title vacancy_company">${vacancy['company'] ? vacancy['company'] : ''}</h6>
+                                                <h6 class="card-title vacancy_site">hh</h6>
+                                                <p class="card-text vacancy_description">${vacancy['description']}</p>
                                             </div>
-                                            <a href="${vacancy['link']}" class="btn btn-primary">Go to vacancy</a>
+                                            <a href="${vacancy['link']}" class="btn btn-primary vacancy_link">Go to vacancy</a>
                                         </div>
                                     </div>
                         `);
@@ -182,8 +185,39 @@
                     alert(ex)
                 }
             }
-        }
 
+            static save(btn) {
+                btn = $(btn);
+                let parent = btn.parent();
+                console.log({
+                    title: parent.find('.vacancy_title').text(),
+                    location: parent.find('.vacancy_city').text(),
+                    salary: parent.find('.vacancy_salary').text(),
+                    company: parent.find('.vacancy_company').text(),
+                    description: parent.find('.vacancy_description').text(),
+                    link: parent.find('.vacancy_link').attr('href'),
+                    site: parent.find('.vacancy_site').text()
+                })
+                $.ajax({
+                    url: '{{route('profile.vacancy.store')}}',
+                    type: 'POST',
+                    data: {
+                        _method: 'POST',
+                        _token: '{{csrf_token()}}',
+                        title: parent.find('.vacancy_title').text(),
+                        location: parent.find('.vacancy_city').text(),
+                        salary: parent.find('.vacancy_salary').text(),
+                        company: parent.find('.vacancy_company').text(),
+                        description: parent.find('.vacancy_description').text(),
+                        link: parent.find('.vacancy_link').attr('href'),
+                        site: parent.find('.vacancy_site').text()
+                    },
+                    success: function (response) {
+                        btn.html('&#9733;').css('color', '#ffcc99');
+                    }
+                })
+            }
+        }
 
 
         function search() {
@@ -192,7 +226,7 @@
                 type: 'POST',
                 data: {
                     _method: 'POST',
-                    _token:  '{{csrf_token()}}',
+                    _token: '{{csrf_token()}}',
                     query: $('.search_field').eq(0).val(),
                     options: {
                         sites,
@@ -204,5 +238,7 @@
                 }
             })
         }
+
+
     </script>
 @show

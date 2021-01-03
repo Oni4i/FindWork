@@ -36,8 +36,8 @@ class HeadHunter implements IWorkSite {
      */
     private static function getAllCountriesData($query, $options) {
         if (!$options || !$options['countries']) $options['countries'] = [];
-        $codes = self::getCodesByCountries($options['countries']);
 
+        $codes = self::getCodesByCountries($options['countries']);
         if (!$codes) return [];
 
         foreach ($codes as $code) {
@@ -47,6 +47,7 @@ class HeadHunter implements IWorkSite {
         }
 
         $urls =[];
+
         foreach ($pages as $code => $value) {
             for ($i = 0; $i < $value['pages'] || ($value['pages'] === 0 && $i === 0); $i++) {
                 $urls[$code][] = self::getPreparedUrl($query, $code, $options, $i);
@@ -54,6 +55,7 @@ class HeadHunter implements IWorkSite {
         }
 
         $result = [];
+
         foreach ($urls as $code => $codeUrls) {
             foreach ($codeUrls as $url) {
 //                $result[$code][] = self::getVacancies($url);
@@ -70,31 +72,32 @@ class HeadHunter implements IWorkSite {
     private static function getVacancies($url) {
         $html = new HTML5DOMDocument();
         $html->loadHTMLFile($url, LIBXML_NOERROR);
-        $selector = $html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy');
 
+        $selector = $html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy');
         if (!$selector) return null;
 
         $vacancies = [];
-        foreach ($selector as $vacancyHtml) {
-            $vacancy['title'] = $vacancyHtml->querySelector('.vacancy-serp-item__info .g-user-content a')->getTextContent();
-            $vacancy['link'] = $vacancyHtml->querySelector('.vacancy-serp-item__info .g-user-content a')->getAttribute('href');
-            $vacancy['link'] = explode('?', str_replace('//', '/', $vacancy['link']))[0];
-            $vacancy['city'] = $vacancyHtml->querySelector('span[data-qa="vacancy-serp__vacancy-address"]')->getTextContent();
-            $vacancy['description'] = $vacancyHtml->querySelector('div[data-qa="vacancy-serp__vacancy_snippet_responsibility"]')->getTextContent();
 
-            $vacancy['company'] = $vacancyHtml->querySelector('a[data-qa="vacancy-serp__vacancy-employer"]');
+        for ($i = 0; $i < sizeof($selector); $i++) {
+            $temp = $selector[$i];
+            $vacancy['title'] = $temp->querySelector('.vacancy-serp-item__info .g-user-content a')->getTextContent();
+            $vacancy['link'] = $temp->querySelector('.vacancy-serp-item__info .g-user-content a')->getAttribute('href');
+            $vacancy['link'] = explode('?', str_replace('//', '/', $vacancy['link']))[0];
+            $vacancy['city'] = $temp->querySelector('span[data-qa="vacancy-serp__vacancy-address"]')->getTextContent();
+            $vacancy['description'] = $temp->querySelector('div[data-qa="vacancy-serp__vacancy_snippet_responsibility"]')->getTextContent();
+
+            $vacancy['company'] = $temp->querySelector('a[data-qa="vacancy-serp__vacancy-employer"]');
             if ($vacancy['company']) {
                 $vacancy['company'] = trim($vacancy['company']->getTextContent());
             }
 
-            $vacancy['salary'] = $vacancyHtml->querySelector('span[data-qa="vacancy-serp__vacancy-compensation"]');
+            $vacancy['salary'] = $temp->querySelector('span[data-qa="vacancy-serp__vacancy-compensation"]');
             if ($vacancy['salary']) {
                 $vacancy['salary'] = $vacancy['salary']->getTextContent();
             }
 
             $vacancies[] = $vacancy;
         }
-
         return $vacancies ?? null;
     }
 
@@ -149,11 +152,11 @@ class HeadHunter implements IWorkSite {
         } else {
             $codes = $codesJSON;
         }
-        return array_chunk($codes, count($codes))[0];
+        return $codes ? array_chunk($codes, count($codes))[0] : [];
     }
 
     /**
-     * @return object
+     * @return array
      */
     private static function getCodesJSON() {
         return json_decode(file_get_contents(asset('json/countries.json')));

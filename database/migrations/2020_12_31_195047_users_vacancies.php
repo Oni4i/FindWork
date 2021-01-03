@@ -13,7 +13,7 @@ class UsersVacancies extends Migration
      */
     public function up()
     {
-        Schema::create('users_vacancies', function (Blueprint $table) {
+        Schema::create('user_vacancy', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('vacancy_id');
 
