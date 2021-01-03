@@ -39,7 +39,7 @@ class FindController extends Controller
             );
         }
 
-        $links = User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->pluck('link');
+        $links = Auth::user()->vacancies()->with('vacancies')->pluck('link');
         foreach ($data as &$site) {
             if (!is_array($site)) continue;
             foreach ($site as &$info) {

@@ -50,9 +50,9 @@ class VacancyController extends Controller
         ]);
 
         $vacancy = Vacancy::query()->where('link', $request->link)->first();
-        if (!$vacancy || !User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->find($vacancy->id)) {
+        if (!$vacancy || !Auth::user()->find($vacancy->id)) {
             if (!$vacancy) $vacancy = Vacancy::query()->create($request->all());
-            $vacancy->users()->attach(User::query()->find(Auth::user()->id));
+            $vacancy->users()->attach(Auth::user());
         }
 
         return response()->json(['success' => 1]);
@@ -104,8 +104,8 @@ class VacancyController extends Controller
             'link' => 'required'
         ]);
         $vacancy = Vacancy::query()->where('link', $request->link)->first();
-        if ($vacancy && User::query()->with('vacancies')->find(Auth::user()->id)->vacancies()->find($vacancy->id)) {
-            User::query()->find(Auth::user()->id)->vacancies()->detach($vacancy);
+        if ($vacancy && Auth::user()->vacancies()->find($vacancy->id)) {
+            Auth::user()->vacancies()->detach($vacancy);
         }
         return response()->json(['success' => 1]);
     }
