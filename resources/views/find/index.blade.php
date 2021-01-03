@@ -87,7 +87,7 @@
 
 @section('scripts')
     <script>
-        let countries = ['Россия', 'Украина'];
+        let countries = ['Russia'];
         let sites = [];
 
         document.addEventListener("DOMContentLoaded", function (event) {
@@ -176,8 +176,8 @@
                                                 <h6 class="card-title vacancy_site">hh</h6>
                                                 <p class="card-text vacancy_description">${vacancy['description']}</p>
                                             </div>
-                                            <a href="${vacancy['link']}" class="btn btn-primary vacancy_link">Go to vacancy</a>
                                         </div>
+                                        <a href="${vacancy['link']}" class="btn btn-primary vacancy_link">Go to vacancy</a>
                                     </div>
                         `);
                     })
@@ -239,12 +239,10 @@
                     success: function (response) {
                         btn.html('&#9733;')
                         btn.data('favourite', '1');
-
                     }
                 })
             }
         }
-
 
         function search() {
             $.ajax({

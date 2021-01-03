@@ -145,7 +145,7 @@ class HeadHunter implements IWorkSite {
         if ($countries) {
             $codes = array_filter($codesJSON, function ($country) use ($countries) {
                 foreach ($countries as $countryName) {
-                    if ($countryName == $country->name) return true;
+                    if (strtolower($countryName) == $country->name) return true;
                 }
                 return false;
             });
