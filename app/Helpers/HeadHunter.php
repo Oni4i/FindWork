@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Helpers;
-use App\Helpers\WorkSite\IWorkParser;
+use App\Helpers\WorkSite\AWorkParser;
 use IvoPetkov\HTML5DOMDocument;
 
-class HeadHunter implements IWorkParser {
+class HeadHunter extends AWorkParser {
 
     private $url = 'https://hh.ru/search/vacancy?';
     private $DOM;
@@ -15,19 +15,19 @@ class HeadHunter implements IWorkParser {
         'clusters' => 'true',
         'st' => 'searchVacancy'
     ];
-    private $allowOptions = [
+    protected $allowOptions = [
         'query' =>'text',
         'salary' => 'salary',
     ];
 
     private $countries = [];
-    private $options = [];
+    protected $options = [];
 
     public function set(HTML5DOMDocument $dom, array $options, string $url = null) {
         if ($url) $this->url = $url;
         $this->DOM = $dom;
         $this->setOptions($options);
-        $this->countries = $this->getAreas($options['countries']);
+        $this->countries = $this->getCodesCountries($options['countries']);
     }
 
     public function get($page = 0) {
@@ -93,15 +93,7 @@ class HeadHunter implements IWorkParser {
             );
     }
 
-    private function setOptions($options) {
-        foreach ($options as $key => $value) {
-            if (key_exists($key, $this->allowOptions)) {
-                $this->options[$this->allowOptions[$key]] = $value;
-            }
-        }
-    }
-
-    private function getAreas($countries) {
+    private function getCodesCountries($countries) {
         $areas = json_decode(file_get_contents(asset('json/countries.json')));
         $areas = array_filter($areas, function ($country) use ($countries) {
             foreach ($countries as $countryName) {

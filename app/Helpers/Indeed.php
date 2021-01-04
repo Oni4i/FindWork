@@ -1,22 +1,48 @@
 <?php
 
 namespace App\Helpers;
-use App\Helpers\WorkSite\IWorkSite;
+use App\Helpers\WorkSite\AWorkParser;
 use IvoPetkov\HTML5DOMDocument;
 
-class Indeed implements IWorkSite {
-    private static $countriesUrl = 'https://www.indeed.com/worldwide';
+class Indeed extends AWorkParser {
 
-    public static function search($query, $options) {
-        $html = new HTML5DOMDocument();
+    private $countriesUrl = 'https://www.indeed.com/worldwide';
+    private $DOM;
 
-        $countries = self::getCountries($html);
+    private $defaultOptions = [
+    ];
+    protected $allowOptions = [
+        'query' =>'q'
+    ];
 
-        for ($i = 0; $i < sizeof($countries); $i++) {
-            $countries[$i]['pages'] = self::getNumberOfPage($html, $query, $options, $countries[$i]['link']);
+    private $countries = [];
+    protected $options = [];
+
+    public function set(HTML5DOMDocument $dom, array $options, string $url = null) {
+        if ($url) $this->url = $url;
+        $this->DOM = $dom;
+        $this->setOptions($options);
+        $this->countries = $this->getCountriesLinks($options['countries']);
+    }
+
+    public function get($page = 0) {
+
+    }
+
+    public function getAll() {
+        $data = [];
+        for ($i = 0; $i < sizeof($this->countries); $i++) {
+            $country = $this->countries[$i];
+            $page = 0;
+            while (true) {
+                $url = $this->getSearchUrl($country['link'], $page);
+                $this->DOM->loadHTMLFile($url, HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
+                if ($this->isError($this->DOM)) break;
+                $data = array_merge($data, $this->getVacancies($this->DOM));
+                $page++;
+            }
         }
-
-        return $countries;
+        return $data;
     }
 
     /**
@@ -25,33 +51,24 @@ class Indeed implements IWorkSite {
      * @param null|integer $page
      * @return string
      */
-    private static function getPreparedUrl($query, $options, $url, $page = null) {
-        $params = [
-            'q' => $query
-        ];
-        if ($page !== null) $params['start'] = $page * 10;
-        return $url . '?' . http_build_query($params);
+    private function getSearchUrl($url, $page) {
+        return $url . http_build_query(
+                $this->options +
+                $this->defaultOptions +
+                ['start' => $page * 10]
+            );
     }
 
-    private static function getNumberOfPage(HTML5DOMDocument $html, $query, $options, $link, $page = 0) {
-        $url = self::getPreparedUrl($query, $options, $link, $page);
-        $html->loadHTMLFile($url, HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
-
-        if ($html->querySelector('.pagination-list svg')) {
-            $html = self::getNumberOfPage($html, $query, $options, $link, $page + 1);
-        } else {
-            return $html;
-        }
-
-        ///
+    private function getVacancies($html) {
+        return [];
     }
 
     /**
      * @return array
      */
-    public static function getCountries(HTML5DOMDocument $html) {
-        $html->loadHTMLFile(self::$countriesUrl, LIBXML_NOERROR);
-        $countriesList = $html->querySelectorAll('.countriesContainer .countries li.countryItem');
+    private function getAllCountriesLinks() {
+        $this->DOM->loadHTMLFile($this->countriesUrl, LIBXML_NOERROR);
+        $countriesList = $this->DOM->querySelectorAll('.countriesContainer .countries li.countryItem');
 
         $countries = [];
 
@@ -63,9 +80,26 @@ class Indeed implements IWorkSite {
             if ($a) $link = $a->getAttribute('href');
             else $link = 'www.indeed.com';
 
-            $countries[] = ['name' => $countryName, 'link' => $link . '/jobs'];
+            $countries[] = ['name' => $countryName, 'link' => $link . '/jobs?'];
         }
 
         return $countries;
+    }
+
+    private function getCountriesLinks(array $countries) {
+        $allCountries = $this->getAllCountriesLinks();
+        $countries = array_map('strtolower', $countries);
+        $foundCountries = [];
+        for ($i = 0; $i < sizeof($allCountries); $i++) {
+            if (in_array($allCountries[$i]['name'], $countries)) {
+                $foundCountries[] = $allCountries[$i];
+            }
+        }
+
+        return $foundCountries;
+    }
+
+    private function isError($html) {
+        return sizeof($html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy')) ? false : true;
     }
 }

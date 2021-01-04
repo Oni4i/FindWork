@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Helpers;
-use App\Helpers\WorkSite\IWorkParser;
+use App\Helpers\WorkSite\AWorkParser;
 use Illuminate\Http\Request;
 use IvoPetkov\HTML5DOMDocument;
 
@@ -13,20 +13,15 @@ class WorkSiteHelper {
     public static function getParsers(array $sites) {
         $parsers = [];
         for ($i = 0; $i < sizeof($sites); $i++) {
-            switch ($sites[$i]) {
-                case 'hh':
-                    $parsers[] = new HeadHunter();
-                    break;
-                case 'indeed':
-                    $parsers[] = new Indeed();
-                    break;
-            }
+            $site = $sites[$i];
+            if ($site === 'hh') $parsers[] = new HeadHunter();
+            else if ($site === 'indeed') $parsers[] = new Indeed();
         }
         return $parsers;
     }
 
     public static function getData(HTML5DOMDocument $dom, Request $request, array $workSites) {
-        $data = array_map(function (IWorkParser $parser) use ($dom, $request) {
+        $data = array_map(function (AWorkParser $parser) use ($dom, $request) {
             $parser->set($dom, $request->options);
             return $parser->getAll();
         }, $workSites);
