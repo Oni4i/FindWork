@@ -2,7 +2,9 @@
 
 namespace App\Helpers\WorkSite;
 
-interface IWorkSite {
+use IvoPetkov\HTML5DOMDocument;
+
+interface IWorkParser {
     /**
      * @param string $query
      * @param array $options
@@ -15,5 +17,7 @@ interface IWorkSite {
      *      company => integer|null
      *]
      */
-    public static function search($query, $options);
+    public function get($page = 0);
+    public function getAll();
+    public function set(HTML5DOMDocument $dom, array $options, string $url = null);
 }

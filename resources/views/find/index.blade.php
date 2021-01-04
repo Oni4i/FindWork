@@ -161,9 +161,7 @@
                     let vacancies = json;
                     let vacanciesRow = $('.vacancies_row');
                     vacanciesRow.html('');
-
-
-                    vacancies['response']['hh'].forEach(vacancy => {
+                    vacancies['response'].forEach(vacancy => {
                         vacanciesRow.append(`
                                     <div class="col mb-4">
                                         <div class="card card-work">
@@ -177,7 +175,7 @@
                                                 <p class="card-text vacancy_description">${vacancy['description']}</p>
                                             </div>
                                         </div>
-                                        <a href="${vacancy['link']}" class="btn btn-primary vacancy_link">Go to vacancy</a>
+                                        <a href="${vacancy['link']}" target="_blank" class="btn btn-primary vacancy_link">Go to vacancy</a>
                                     </div>
                         `);
                     })
@@ -197,7 +195,7 @@
             }
 
             static delete(btn) {
-                let parent = btn.parent();
+                let parent = btn.parent().parent();
                 $.ajax({
                     url: '{{route('profile.vacancy.destroy')}}',
                     type: 'POST',
@@ -220,8 +218,8 @@
             }
 
             static save(btn) {
-                let parent = btn.parent();
-                console.log(btn.data('favourite'))
+                let parent = btn.parent().parent();
+                console.log(parent.find('.vacancy_link').attr('href'))
                 $.ajax({
                     url: '{{route('profile.vacancy.store')}}',
                     type: 'POST',
@@ -251,10 +249,11 @@
                 data: {
                     _method: 'POST',
                     _token: '{{csrf_token()}}',
-                    query: $('.search_field').eq(0).val(),
+
                     options: {
                         sites,
-                        countries
+                        countries,
+                        query: $('.search_field').eq(0).val(),
                     }
                 },
                 success: function (response) {

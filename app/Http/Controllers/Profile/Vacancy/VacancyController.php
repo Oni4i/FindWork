@@ -46,7 +46,7 @@ class VacancyController extends Controller
             'salary' => 'string|nullable',
             'company' => 'string|nullable',
             'description' => 'string|nullable',
-            'link' => 'required|string|min:20',
+            'link' => 'required|string|min:10',
         ]);
 
         $vacancy = Vacancy::query()->where('link', $request->link)->first();

@@ -41,4 +41,8 @@ class User extends Authenticatable
     public function vacancies() {
         return $this->belongsToMany(Vacancy::class);
     }
+
+    public function vacanciesLink() {
+        return $this->vacancies()->with('vacancies')->pluck('link');
+    }
 }

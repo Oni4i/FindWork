@@ -1,83 +1,64 @@
 <?php
 
 namespace App\Helpers;
-use App\Helpers\WorkSite\IWorkSite;
+use App\Helpers\WorkSite\IWorkParser;
 use IvoPetkov\HTML5DOMDocument;
 
-class HeadHunter implements IWorkSite {
-    private static $url = 'https://hh.ru/search/vacancy?';
+class HeadHunter implements IWorkParser {
 
-    private static $options = [
+    private $url = 'https://hh.ru/search/vacancy?';
+    private $DOM;
 
-    ];
-
-    private static $defaultOptions = [
+    private $defaultOptions = [
         'L_is_autosearch' => 'false',
-        'clusters' => 'true',
         'enable_snippets' => 'true',
+        'clusters' => 'true',
         'st' => 'searchVacancy'
     ];
+    private $allowOptions = [
+        'query' =>'text',
+        'salary' => 'salary',
+    ];
 
-    /**
-     * @param string $query
-     * @param array $options
-     * @return array
-     */
-    public static function search($query, $options) {
-        $html = new HTML5DOMDocument();
-        $html->loadHTMLFile(self::$url, LIBXML_NOERROR);
-        return self::getAllCountriesData($query, $options);
+    private $countries = [];
+    private $options = [];
+
+    public function set(HTML5DOMDocument $dom, array $options, string $url = null) {
+        if ($url) $this->url = $url;
+        $this->DOM = $dom;
+        $this->setOptions($options);
+        $this->countries = $this->getAreas($options['countries']);
     }
 
-    /**
-     * @param string $query
-     * @param array $options
-     * @return array
-     */
-    private static function getAllCountriesData($query, $options) {
-        if (!$options || !$options['countries']) $options['countries'] = [];
-
-        $codes = self::getCodesByCountries($options['countries']);
-        if (!$codes) return [];
-
-        foreach ($codes as $code) {
-            $url = self::getPreparedUrl($query, $code->id, $options);
-            $pages[$code->id]['pages'] = self::getNumberOfPages($url);
-            $pages[$code->id]['name'] = $code->name;
-        }
-
-        $urls =[];
-
-        foreach ($pages as $code => $value) {
-            for ($i = 0; $i < $value['pages'] || ($value['pages'] === 0 && $i === 0); $i++) {
-                $urls[$code][] = self::getPreparedUrl($query, $code, $options, $i);
-            }
-        }
-
-        $result = [];
-
-        foreach ($urls as $code => $codeUrls) {
-            foreach ($codeUrls as $url) {
-//                $result[$code][] = self::getVacancies($url);
-                $result = array_merge($result, self::getVacancies($url));
-            }
-        }
-        return $result;
+    public function get($page = 0) {
+//        $url = $this->getSearchUrl($page);
+//        $html = $this->DOM->loadHTMLFile($url);
+//
+//        if ($this->isError($html)) return null;
+//        $data = $this->getVacancies($html);
+//
+//        return $data;
     }
 
-    /**
-     * @param string $url
-     * @return array|null
-     */
-    private static function getVacancies($url) {
-        $html = new HTML5DOMDocument();
-        $html->loadHTMLFile($url, LIBXML_NOERROR);
+    public function getAll() {
+        $data = [];
+        for ($i = 0; $i < sizeof($this->countries); $i++) {
+            $country = $this->countries[$i];
+            $page = 0;
+            while (true) {
+                $url = $this->getSearchUrl($page, $country);
+                $this->DOM->loadHTMLFile($url, LIBXML_NOERROR);
+                if ($this->isError($this->DOM)) break;
+                $data = array_merge($data, $this->getVacancies($this->DOM));
+                $page++;
+            }
+        }
+        return $data;
+    }
 
+    private function getVacancies($html) {
         $selector = $html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy');
-        if (!$selector) return null;
-
         $vacancies = [];
-
         for ($i = 0; $i < sizeof($selector); $i++) {
             $temp = $selector[$i];
             $vacancy['title'] = $temp->querySelector('.vacancy-serp-item__info .g-user-content a')->getTextContent();
@@ -95,70 +76,42 @@ class HeadHunter implements IWorkSite {
             if ($vacancy['salary']) {
                 $vacancy['salary'] = $vacancy['salary']->getTextContent();
             }
-
             $vacancies[] = $vacancy;
         }
-        return $vacancies ?? null;
+        return $vacancies;
     }
 
-    /**
-     * @param string $url
-     * @return integer
-     */
-    private static function getNumberOfPages($url) {
-        $html = new HTML5DOMDocument();
-        $html->loadHTMLFile($url, LIBXML_NOERROR);
-        $selector = $html->querySelectorAll('a.bloko-button.HH-Pager-Control');
-        if (!$selector || count($selector) <= 2) {
-            return 0;
-        }
-        return (int)$selector[count($selector) - 2]->getTextContent();
+    private function isError($html) {
+        return sizeof($html->querySelectorAll('.vacancy-serp-item.HH-VacancySidebarTrigger-Vacancy')) ? false : true;
     }
 
-    /**
-     * @param string $query
-     * @param integer $code
-     * @param array $options
-     * @param null|integer $page
-     * @return string
-     */
-    private static function getPreparedUrl($query, $code, $options, $page = null) {
-        $params = [
-            'text' => $query,
-            'area' => $code
-        ] + self::$defaultOptions;
-        if ($page !== null) $params['page'] = $page;
-        foreach ($options as $name => $value) {
-            if (in_array($name, array_keys(self::$options))) {
-                $params[self::$options[$name]] = $value;
+    private function getSearchUrl($page, $country) {
+        return $this->url . http_build_query(
+            $this->options +
+            $this->defaultOptions +
+            ['page' => $page, 'area' => $country]
+            );
+    }
+
+    private function setOptions($options) {
+        foreach ($options as $key => $value) {
+            if (key_exists($key, $this->allowOptions)) {
+                $this->options[$this->allowOptions[$key]] = $value;
             }
         }
-        return self::$url . http_build_query($params);
     }
 
-    /**
-     * @param array $countries
-     * @return array
-     */
-    private static function getCodesByCountries($countries) {
-        $codesJSON = self::getCodesJSON();
-        if ($countries) {
-            $codes = array_filter($codesJSON, function ($country) use ($countries) {
-                foreach ($countries as $countryName) {
-                    if (strtolower($countryName) == $country->name) return true;
-                }
-                return false;
-            });
-        } else {
-            $codes = $codesJSON;
-        }
-        return $codes ? array_chunk($codes, count($codes))[0] : [];
-    }
-
-    /**
-     * @return array
-     */
-    private static function getCodesJSON() {
-        return json_decode(file_get_contents(asset('json/countries.json')));
+    private function getAreas($countries) {
+        $areas = json_decode(file_get_contents(asset('json/countries.json')));
+        $areas = array_filter($areas, function ($country) use ($countries) {
+            foreach ($countries as $countryName) {
+                if (strtolower($countryName) == $country->name) return true;
+            }
+            return false;
+        });
+        $areas = array_map(function ($area) {
+            return $area->id;
+        }, $areas);
+        return $areas;
     }
 }
